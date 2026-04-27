@@ -1,0 +1,58 @@
+"use client";
+
+import { create } from "zustand";
+
+import { createBaselineSnapshot, resetSimulationState, tickSimulation } from "@/lib/simulation";
+import { type BaselineSnapshot, type DvfsMode, type SchedulerAlgorithm, type SimulationRunState } from "@/lib/types";
+
+interface SimulationStore {
+  simulation: SimulationRunState;
+  baseline: BaselineSnapshot;
+  isRunning: boolean;
+  setAlgorithm: (algorithm: SchedulerAlgorithm) => void;
+  setDvfsMode: (mode: DvfsMode) => void;
+  reset: () => void;
+  tick: () => void;
+  toggleRunning: () => void;
+}
+
+const initialSimulation = resetSimulationState("DVFS-ERT", "adaptive");
+
+export const useSimulationStore = create<SimulationStore>((set, get) => ({
+  simulation: initialSimulation,
+  baseline: createBaselineSnapshot(initialSimulation),
+  isRunning: true,
+  setAlgorithm: (algorithm) => {
+    const simulation = resetSimulationState(algorithm, get().simulation.dvfsMode);
+    set({
+      simulation,
+      baseline: createBaselineSnapshot(simulation)
+    });
+  },
+  setDvfsMode: (mode) => {
+    const simulation = resetSimulationState(get().simulation.algorithm, mode);
+    set({
+      simulation,
+      baseline: createBaselineSnapshot(simulation)
+    });
+  },
+  reset: () => {
+    const simulation = resetSimulationState(get().simulation.algorithm, get().simulation.dvfsMode);
+    set({
+      simulation,
+      baseline: createBaselineSnapshot(simulation)
+    });
+  },
+  tick: () => {
+    const { simulation, baseline, isRunning } = get();
+    if (!isRunning) {
+      return;
+    }
+    const next = tickSimulation(simulation, baseline);
+    set({
+      simulation: next.state,
+      baseline: next.baseline
+    });
+  },
+  toggleRunning: () => set((state) => ({ isRunning: !state.isRunning }))
+}));

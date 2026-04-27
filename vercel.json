@@ -1,0 +1,31 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        panel: "#071015",
+        shell: "#04070b",
+        cyan: "#6ff3ff",
+        amber: "#ffc857",
+        ember: "#ff7a45",
+        line: "#16313a",
+        ink: "#d9fbff",
+        muted: "#7ca2ab"
+      },
+      boxShadow: {
+        glow: "0 0 0 1px rgba(111,243,255,0.16), 0 0 24px rgba(111,243,255,0.08)"
+      },
+      backgroundImage: {
+        grid: "linear-gradient(rgba(111,243,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(111,243,255,0.06) 1px, transparent 1px)"
+      }
+    }
+  },
+  plugins: []
+};
+
+export default config;
